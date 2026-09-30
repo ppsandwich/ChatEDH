@@ -18,6 +18,7 @@ import {
   type PlayerId,
 } from "./lib/game";
 import { Modal } from "./components/Modal";
+import { PriorityBanner } from "./components/PriorityBanner";
 import { CardText, CardView, Mana } from "./components/CardView";
 const SAVE = "chatedh-game-v1";
 function loadGame(): Game | null {
@@ -163,6 +164,7 @@ export default function App() {
   const [confirmConcede, setConfirmConcede] = useState(false);
   const [autoAi, setAutoAi] = useState(true);
   const [autoPass, setAutoPass] = useState(true);
+  const [automationPaused, setAutomationPaused] = useState(false);
   const [checkingPriority, setCheckingPriority] = useState(false);
   const checkedPriority = useRef<Game | null>(null);
   const [automationCount, setAutomationCount] = useState(0);
@@ -247,12 +249,10 @@ export default function App() {
     } catch (e) {
       if (e instanceof Error && e.name === "AbortError") {
         setNotice("AI request cancelled. Your game has not changed.");
-        setAutoAi(false);
-        setAutoPass(false);
+        setAutomationPaused(true);
       } else {
         setError(e instanceof Error ? e.message : "The request failed.");
-        setAutoAi(false);
-        setAutoPass(false);
+        setAutomationPaused(true);
       }
     } finally {
       busyRef.current = false;
@@ -266,6 +266,7 @@ export default function App() {
       game?.status === "playing" &&
       game.priority === "ai" &&
       autoAi &&
+      !automationPaused &&
       connected &&
       !busy &&
       !settings &&
@@ -278,12 +279,22 @@ export default function App() {
       );
       return () => clearTimeout(t);
     }
-  }, [game, autoAi, connected, busy, automationCount, settings, editor]);
+  }, [
+    game,
+    autoAi,
+    automationPaused,
+    connected,
+    busy,
+    automationCount,
+    settings,
+    editor,
+  ]);
   useEffect(() => {
     if (
       game?.status === "playing" &&
       game.priority === "you" &&
       autoPass &&
+      !automationPaused &&
       connected &&
       !busy &&
       !settings &&
@@ -306,6 +317,7 @@ export default function App() {
   }, [
     game,
     autoPass,
+    automationPaused,
     connected,
     busy,
     settings,
@@ -335,6 +347,7 @@ export default function App() {
     setAutomationCount(0);
     setAutoAi(true);
     setAutoPass(true);
+    setAutomationPaused(false);
     checkedPriority.current = null;
     setSelected(null);
     commit(next, false);
@@ -355,8 +368,7 @@ export default function App() {
     setHistory((h) => h.slice(0, -1));
     gameRef.current = prev;
     setGame(prev);
-    setAutoAi(false);
-    setAutoPass(false);
+    setAutomationPaused(true);
     setBottom([]);
     setSelected(null);
     setError("");
@@ -364,14 +376,29 @@ export default function App() {
   }
   function openEditor() {
     if (!game || busyRef.current) return;
-    setAutoAi(false);
-    setAutoPass(false);
+    setAutomationPaused(true);
     setEditText(exportGame(game));
     setEditor(true);
   }
   const selectedCard = game?.cards.find((c) => c.id === selected);
   const usable =
     !!game && game.status === "playing" && game.priority === "you" && !busy;
+  useEffect(() => {
+    document.title =
+      screen === "play" && usable
+        ? "Your priority · ChatEDH"
+        : "ChatEDH — A seat at the table";
+  }, [screen, usable]);
+  function goToActions() {
+    const input = document.getElementById("game-action");
+    input?.closest(".action-panel")?.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+    input?.focus({ preventScroll: true });
+  }
   function cardAction(text: string) {
     if (!selectedCard) return;
     setAction(`${text} ${selectedCard.name} [${selectedCard.id}]. `);
@@ -709,8 +736,14 @@ export default function App() {
               </button>
             </div>
           </div>
+          <PriorityBanner
+            game={game}
+            busy={busy}
+            checkingPriority={checkingPriority}
+            onGoToActions={goToActions}
+          />
           <div className="table-layout">
-            <div className="table-main">
+            <div className={`table-main ${usable ? "your-priority" : ""}`}>
               <PlayerBar
                 game={game}
                 player="ai"
@@ -852,7 +885,22 @@ export default function App() {
                   </button>
                 </div>
               ) : (
-                <section className="action-panel">
+                <section
+                  className={`action-panel ${usable ? "your-priority" : ""}`}
+                  aria-label="Game actions"
+                >
+                  <div className="action-priority-heading">
+                    <h2>
+                      {usable
+                        ? "Your action"
+                        : busy
+                          ? "Action in progress"
+                          : "Waiting for the opponent"}
+                    </h2>
+                    {usable && (
+                      <span className="priority-state">You have priority</span>
+                    )}
+                  </div>
                   <p className="decision-prompt" aria-live="polite">
                     {game.prompt}
                   </p>
@@ -941,6 +989,7 @@ export default function App() {
                     checked={autoAi}
                     onChange={(e) => {
                       setAutoAi(e.target.checked);
+                      if (e.target.checked) setAutomationPaused(false);
                       setAutomationCount(0);
                     }}
                   />{" "}
@@ -953,12 +1002,33 @@ export default function App() {
                     onChange={(e) => {
                       setAutoPass(e.target.checked);
                       setAutomationCount(0);
-                      if (e.target.checked) checkedPriority.current = null;
-                      else if (checkingPriority) abortRef.current?.abort();
+                      if (e.target.checked) {
+                        checkedPriority.current = null;
+                        setAutomationPaused(false);
+                      } else if (checkingPriority) abortRef.current?.abort();
                     }}
                   />
                   Auto-pass when no legal actions
                 </label>
+                {automationPaused &&
+                  (autoAi || autoPass) &&
+                  game.status === "playing" && (
+                    <div className="automation-pause" role="status">
+                      <strong>Automatic play paused</strong>
+                      <p>Your autoplay settings are still enabled.</p>
+                      <button
+                        disabled={busy || !connected}
+                        onClick={() => {
+                          checkedPriority.current = null;
+                          setAutomationCount(0);
+                          setAutomationPaused(false);
+                          setError("");
+                        }}
+                      >
+                        Resume automatic play
+                      </button>
+                    </div>
+                  )}
                 <p className="small muted">
                   Priority passes automatically only when the referee finds no
                   legal action or pending choice.
@@ -1087,8 +1157,7 @@ export default function App() {
             const g = validateGame(JSON.parse(await file.text()));
             commit(g);
             setScreen("play");
-            setAutoAi(false);
-            setAutoPass(false);
+            setAutomationPaused(true);
             setBottom([]);
             setNotice("Game imported. Automatic play paused.");
           } catch (err) {
@@ -1203,8 +1272,7 @@ export default function App() {
                 onClick={() => {
                   setKey("");
                   setAccessToken("");
-                  setAutoAi(false);
-                  setAutoPass(false);
+                  setAutomationPaused(true);
                   setNotice("Browser key cleared.");
                 }}
               >

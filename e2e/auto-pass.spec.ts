@@ -78,11 +78,12 @@ test("automatically passes, resumes the opponent, then holds a human response wi
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(
     page.getByLabel("Auto-pass when no legal actions"),
-  ).not.toBeChecked();
-  await expect(
-    page.getByLabel("AI autoplay", { exact: true }),
-  ).not.toBeChecked();
+  ).toBeChecked();
+  await expect(page.getByLabel("AI autoplay", { exact: true })).toBeChecked();
   await expect(page.locator(".table-status")).toContainText("AI has priority");
+  await expect(
+    page.getByRole("button", { name: "Resume automatic play" }),
+  ).toBeVisible();
   await page.waitForTimeout(900);
   expect(requests).toHaveLength(3);
 });
@@ -105,10 +106,8 @@ test("an assessment error leaves the game unchanged and pauses automatic play", 
   );
   await expect(
     page.getByLabel("Auto-pass when no legal actions"),
-  ).not.toBeChecked();
-  await expect(
-    page.getByLabel("AI autoplay", { exact: true }),
-  ).not.toBeChecked();
+  ).toBeChecked();
+  await expect(page.getByLabel("AI autoplay", { exact: true })).toBeChecked();
   expect(
     await page.evaluate(() =>
       JSON.parse(localStorage.getItem("chatedh-game-v1")!),
@@ -116,6 +115,11 @@ test("an assessment error leaves the game unchanged and pauses automatic play", 
   ).toEqual(initial);
   await page.waitForTimeout(900);
   expect(requests).toBe(1);
+  await expect(
+    page.getByRole("button", { name: "Resume automatic play" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Resume automatic play" }).click();
+  await expect.poll(() => requests).toBe(2);
 });
 
 test("stops automatic sequences after eight actions until the player continues", async ({
