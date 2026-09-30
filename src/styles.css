@@ -1,0 +1,1725 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Libre+Caslon+Display&display=swap");
+:root {
+  font-family: "DM Sans", sans-serif;
+  color: #25332c;
+  background: #f5f4ed;
+  font-synthesis: none;
+  --paper: #f5f4ed;
+  --surface: #fffef9;
+  --ink: #25332c;
+  --muted: #667269;
+  --line: #d7dcd0;
+  --green: #294f3d;
+  --light: #e6ebdd;
+  --accent: #d8df9a;
+  --radius: 5px;
+  font-size: 14px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  padding: 10px 15px;
+  font-weight: 550;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  min-height: 40px;
+}
+button:hover:not(:disabled) {
+  background: var(--light);
+  border-color: #9cae96;
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #829952;
+  outline-offset: 3px;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid #c7cec0;
+  border-radius: var(--radius);
+  color: var(--ink);
+  padding: 12px;
+  min-height: 44px;
+}
+textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+label {
+  display: block;
+  font-weight: 550;
+  font-size: 13px;
+  margin: 17px 0 8px;
+}
+label input,
+label select,
+label textarea {
+  display: block;
+  margin-top: 8px;
+}
+select {
+  appearance: auto;
+}
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+h1,
+h2 {
+  font-weight: 500;
+}
+p {
+  line-height: 1.65;
+}
+h1 {
+  font-family: "Libre Caslon Display", Georgia, serif;
+  letter-spacing: -0.035em;
+}
+h2 {
+  font-size: 22px;
+  letter-spacing: -0.025em;
+}
+h3 {
+  font-size: 16px;
+}
+small,
+.small {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.muted {
+  color: var(--muted);
+}
+.grow {
+  flex: 1;
+}
+.eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 650;
+  color: var(--muted);
+}
+.primary {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fffef7;
+}
+.primary:hover:not(:disabled) {
+  background: #38634c;
+  border-color: #38634c;
+}
+.text-button {
+  border: 0;
+  padding: 4px 0;
+  min-height: 32px;
+  text-align: left;
+}
+.text-button:hover:not(:disabled) {
+  background: transparent;
+  text-decoration: underline;
+}
+.site-header {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 0 4.5%;
+  border-bottom: 1px solid #344b3d;
+  background: #1e3026;
+  color: #f8f7eb;
+}
+.brand {
+  font-size: 26px;
+  letter-spacing: -1.1px;
+  text-decoration: none;
+  font-weight: 450;
+  white-space: nowrap;
+}
+.brand > span:first-child {
+  font-weight: 700;
+  color: #d6dfb4;
+}
+.brand-caption {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  color: #b7c6b2;
+  margin-top: 3px;
+}
+.site-header nav {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  height: 88px;
+}
+.site-header nav button {
+  border: 0;
+  background: none;
+  border-radius: 0;
+  font-size: 13px;
+  color: #bfcbbc;
+  height: 100%;
+  padding: 0 6px;
+  position: relative;
+}
+.site-header nav .nav-active {
+  color: #fffef7;
+}
+.site-header nav .nav-active:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 6px;
+  right: 6px;
+  height: 3px;
+  background: var(--accent);
+}
+.site-header nav button:hover {
+  color: #fff;
+  background: none;
+}
+.nav-count {
+  font-size: 10px;
+  margin-left: 5px;
+  background: #3a4b3b;
+  padding: 3px 5px;
+  border-radius: 3px;
+}
+.connection-button {
+  border-color: #64705c;
+  font-size: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.connection-button:hover:not(:disabled) {
+  background: #344b3d;
+  color: white;
+}
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #acafa7;
+  flex-shrink: 0;
+}
+.status-dot.online {
+  background: #a5b66a;
+}
+.lobby {
+  max-width: 1240px;
+  min-height: calc(100vh - 153px);
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 100px;
+  padding: 65px 52px 58px;
+  align-items: center;
+}
+.intro h1 {
+  font-size: 94px;
+  line-height: 0.95;
+  margin: 30px 0 28px;
+}
+.intro-copy {
+  font-size: 21px;
+  line-height: 1.55;
+}
+.intro-detail {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 25px;
+}
+.rules-strip {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 28px;
+  margin: 38px 0 25px;
+  padding: 22px 0;
+}
+.rules-strip span {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.rules-strip b {
+  font-size: 24px;
+  font-weight: 450;
+  display: block;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+.session-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  margin: 20px 0 8px;
+}
+.intro > .text-button {
+  font-size: 11px;
+}
+.setup {
+  padding: 30px 32px;
+  background: #eeefe6;
+  border: 1px solid #d4dacb;
+  border-radius: 8px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.setup h2 {
+  font-family: "Libre Caslon Display", Georgia, serif;
+  font-size: 40px;
+  margin: 20px 0 25px;
+}
+.selected-deck {
+  border-left: 2px solid #718555;
+  padding: 15px 18px 12px;
+  margin: 17px 0 22px;
+  background: #e5e9dc;
+}
+.deck-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: #5b6c56;
+}
+.selected-deck h3 {
+  font-size: 15px;
+  margin: 13px 0 7px;
+}
+.selected-deck p {
+  font-size: 12px;
+  margin: 0 0 6px;
+  color: #556650;
+}
+.selected-deck button {
+  font-size: 11px;
+}
+.identity,
+.mana-cost {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.mana-symbol {
+  background: #e0e1d9;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 650;
+  color: #3b4039;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid #28362226;
+}
+.mana-W {
+  background: #f1ebcc;
+}
+.mana-U {
+  background: #c6dce4;
+}
+.mana-B {
+  background: #cac5cd;
+}
+.mana-R {
+  background: #e7bbb0;
+}
+.mana-G {
+  background: #bcd1b4;
+}
+.start-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 25px;
+  padding: 15px 19px;
+  font-size: 14px;
+}
+.start-button span {
+  font-size: 21px;
+}
+.setup-footnote {
+  font-size: 10px;
+  line-height: 1.8;
+  margin: 13px 0 0;
+  color: var(--muted);
+}
+.site-footer {
+  padding: 22px 4.5%;
+  font-size: 10px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.site-footer > span:first-child {
+  font-weight: 600;
+  color: var(--ink);
+}
+.notice,
+.error-banner {
+  padding: 12px 4.5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  font-size: 13px;
+}
+.notice {
+  background: #e4ecd5;
+}
+.error-banner {
+  background: #f5dfd5;
+  color: #713e29;
+}
+.notice button,
+.error-banner button {
+  border: 0;
+  padding: 0 8px;
+  font-size: 22px;
+  min-height: 28px;
+}
+.library-page,
+.guide-page {
+  max-width: 1280px;
+  padding: 56px 45px 70px;
+  margin: auto;
+}
+.page-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 35px;
+}
+.page-title h1,
+.guide-page h1 {
+  font-size: 68px;
+  margin: 12px 0 14px;
+  line-height: 1;
+}
+.page-title p {
+  color: var(--muted);
+}
+.deck-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  margin-bottom: 25px;
+}
+.deck-tile {
+  padding: 25px 25px 20px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+}
+.deck-tile:hover {
+  background: #eef0e6;
+}
+.deck-tile-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.deck-number {
+  color: #708064;
+  font-size: 12px;
+}
+.deck-tile h2 {
+  font-family: "Libre Caslon Display", Georgia, serif;
+  font-size: 35px;
+  margin-bottom: 8px;
+}
+.archetype {
+  font-size: 11px;
+  color: #567044;
+  margin-bottom: 15px;
+}
+.deck-tile p {
+  font-size: 12px;
+  color: var(--muted);
+  flex: 1;
+}
+.tile-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+}
+.tile-actions button {
+  font-size: 11px;
+  padding: 8px 10px;
+}
+.tile-actions button:first-child {
+  border: 0;
+  padding-left: 0;
+}
+.guide-page {
+  max-width: 1080px;
+}
+.guide-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 70px;
+  margin-top: 48px;
+}
+.guide-grid h2 {
+  font-size: 18px;
+  margin-top: 30px;
+}
+.guide-grid p,
+.guide-note p {
+  font-size: 14px;
+  color: var(--muted);
+}
+.guide-note {
+  border-top: 1px solid var(--line);
+  margin-top: 30px;
+  padding-top: 35px;
+}
+.modal {
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  max-height: 90dvh;
+  border: 1px solid #b8c3ae;
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 25px 30px;
+  box-shadow: 0 20px 80px #12271b26;
+}
+.modal::backdrop {
+  background: #14271999;
+}
+.modal.wide {
+  width: 860px;
+}
+.modal > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+.modal > header h2 {
+  margin: 0;
+  font-family: "Libre Caslon Display", Georgia, serif;
+  font-size: 32px;
+}
+.modal > header button {
+  font-size: 11px;
+  padding: 6px 10px;
+}
+.modal p {
+  font-size: 13px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.connection-note {
+  padding: 16px;
+  background: #e8ecdf;
+  margin-top: 24px;
+  font-size: 12px;
+}
+.connection-note p {
+  font-size: 11px;
+  margin: 8px 0 0;
+}
+.deck-card-list {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  max-height: 53vh;
+  overflow: auto;
+}
+.deck-card-list details {
+  border-bottom: 1px solid var(--line);
+}
+.deck-card-list summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 8px;
+  font-size: 13px;
+}
+.deck-card-list summary > span:nth-child(2) {
+  flex: 1;
+}
+.quantity {
+  color: var(--muted);
+}
+.deck-card-list details[open] {
+  padding: 0 16px 16px;
+  background: #eef0e5;
+}
+.deck-card-list details[open] > summary {
+  padding-left: 0;
+}
+.deck-card-list details[open] .card-title {
+  margin-top: 10px;
+}
+.deck-card-list .oracle {
+  max-width: 600px;
+}
+.inline-form {
+  display: flex;
+  align-items: end;
+  gap: 15px;
+}
+.inline-form > button {
+  margin-bottom: 8px;
+}
+.game-page {
+  padding: 0 25px 30px;
+  max-width: 1800px;
+  margin: auto;
+}
+.game-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 78px;
+}
+.game-toolbar > div:first-child {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+.game-toolbar strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+.game-toolbar strong .muted {
+  padding: 0 8px;
+}
+.toolbar-actions {
+  display: flex;
+  gap: 7px;
+}
+.toolbar-actions button {
+  font-size: 11px;
+  padding: 7px 11px;
+  min-height: 34px;
+}
+.table-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
+}
+.table-main {
+  border: 1px solid var(--line);
+  background: #f9f9f2;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.player-bar {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 20px;
+  background: #edf0e5;
+  border-bottom: 1px solid var(--line);
+}
+.player-bar.active-player {
+  border-left: 3px solid #708653;
+  padding-left: 17px;
+}
+.life-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
+}
+.life-total > span:first-child {
+  font-size: 10px;
+  color: var(--muted);
+}
+.life-total > span:last-child {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: -2px;
+}
+.life-total strong {
+  font-size: 38px;
+  font-weight: 450;
+  line-height: 1.2;
+  letter-spacing: -2px;
+}
+.player-data {
+  flex: 1;
+  min-width: 135px;
+}
+.player-data > strong {
+  font-size: 12px;
+}
+.player-data > .small {
+  font-size: 10px;
+  min-height: 22px;
+}
+.mana-pool {
+  display: flex;
+  gap: 10px;
+  margin: 9px 0 3px;
+}
+.mana-pool > span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+}
+.mana-pool .mana-symbol {
+  width: 16px;
+  height: 16px;
+  font-size: 8px;
+}
+.zone-buttons {
+  display: flex;
+  gap: 7px;
+}
+.zone-buttons button {
+  background: #f8f9ef;
+  min-width: 59px;
+  padding: 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: center;
+}
+.zone-buttons span {
+  font-size: 9px;
+  color: var(--muted);
+}
+.zone-buttons b {
+  font-size: 18px;
+  font-weight: 500;
+}
+.battlefield {
+  padding: 14px 18px;
+  min-height: 158px;
+  background: #f2f4eb;
+}
+.opponent-field {
+  background: #ecefe4;
+}
+.field-label {
+  font-size: 10px;
+  color: #667260;
+  display: flex;
+  justify-content: space-between;
+}
+.field-label > span {
+  color: #77816f;
+}
+.field-empty {
+  min-height: 102px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7d8975;
+  font-size: 12px;
+}
+.permanents {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.text-card {
+  width: 168px;
+  min-width: 168px;
+  max-width: 168px;
+  min-height: 192px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 11px 10px 9px;
+  background: var(--surface);
+  border: 1px solid #bfcbb1;
+  border-top: 3px solid #859974;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.text-card:hover:not(:disabled) {
+  background: #fffef8;
+  border-color: #607e4c;
+}
+.text-card.selected {
+  outline: 3px solid #70864e;
+  outline-offset: -2px;
+  background: #e5ebd9;
+}
+.card-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 9px;
+}
+.text-card .card-title {
+  display: block;
+}
+.card-title h3 {
+  margin: 0;
+  font-size: 20px;
+  font-family: "Libre Caslon Display", Georgia, serif;
+}
+.text-card .card-title strong {
+  font-size: 11px;
+  font-weight: 650;
+  display: block;
+  line-height: 1.35;
+}
+.text-card .mana-cost {
+  margin-top: 7px;
+  gap: 2px;
+}
+.text-card .mana-symbol {
+  width: 15px;
+  height: 15px;
+  font-size: 8px;
+}
+.type-line {
+  border-top: 1px solid #dce1d3;
+  border-bottom: 1px solid #dce1d3;
+  padding: 7px 0;
+  margin: 12px 0;
+  color: #65735d;
+  font-size: 12px;
+}
+.text-card .type-line {
+  font-size: 9px;
+  line-height: 1.3;
+  width: 100%;
+  margin: 8px 0;
+  padding: 5px 0;
+}
+.oracle {
+  white-space: pre-wrap;
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 0 0 12px;
+}
+.text-card .oracle {
+  font-size: 9px;
+  line-height: 1.5;
+  max-height: 86px;
+  overflow: hidden;
+  display: block;
+  font-weight: 400;
+  margin-bottom: 8px;
+  flex: 1;
+}
+.card-foot {
+  font-size: 8px;
+  color: #68765f;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-top: auto;
+  gap: 5px;
+}
+.card-foot b {
+  font-size: 12px;
+  color: var(--ink);
+}
+.text-card.tapped {
+  background: #e8e9e2;
+  border-top-color: #9e8c70;
+  border-style: dashed;
+}
+.text-card.tapped .card-foot {
+  color: #765934;
+}
+.card-notes {
+  display: block;
+  font-size: 10px;
+  background: #e9eddc;
+  padding: 7px;
+  margin: 8px 0 0;
+  color: #4f663b;
+}
+.counter-label {
+  font-size: 9px;
+  padding-top: 4px;
+}
+.land-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.land-card {
+  background: #e7ecdf;
+  padding: 9px 12px;
+  text-align: left;
+  min-width: 110px;
+  max-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-color: #c4cebb;
+}
+.land-card strong {
+  font-size: 10px;
+  font-weight: 550;
+}
+.land-card span {
+  font-size: 9px;
+  color: var(--muted);
+}
+.land-card.tapped {
+  border-style: dashed;
+  background: #e4e2d8;
+}
+.phase-bar {
+  display: flex;
+  background: #253f2f;
+  justify-content: space-between;
+  padding: 0 10px;
+  overflow: auto;
+  gap: 3px;
+}
+.phase-bar span {
+  font-size: 9px;
+  white-space: nowrap;
+  padding: 11px 8px;
+  color: #c0cdb8;
+}
+.phase-bar .current {
+  background: #dae2b6;
+  color: #243e2c;
+  font-weight: 650;
+}
+.table-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 19px;
+  font-size: 10px;
+  background: #e3e8d6;
+  border-bottom: 1px solid #d2dbc5;
+  color: #4c6341;
+}
+.table-status > span:nth-child(2) {
+  font-weight: 650;
+}
+.hand-zone {
+  padding: 18px;
+  background: #fffef7;
+}
+.hand-zone h2 {
+  font-size: 13px;
+  margin: 0;
+}
+.hand-zone h2 span {
+  font-size: 10px;
+  color: var(--muted);
+  padding-left: 7px;
+}
+.hand-cards {
+  display: flex;
+  overflow-x: auto;
+  padding: 12px 2px 8px;
+  gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #b4c19f transparent;
+}
+.hand-cards .text-card {
+  min-height: 220px;
+}
+.hand-cards .text-card .oracle {
+  max-height: 100px;
+}
+.mulligan-bar {
+  padding: 22px 20px;
+  background: #e4ead7;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid #ccd6bd;
+}
+.mulligan-bar > div {
+  flex: 1;
+}
+.mulligan-bar strong {
+  font-size: 13px;
+}
+.mulligan-bar p {
+  font-size: 11px;
+  margin: 5px 0 0;
+  color: var(--muted);
+}
+.action-panel {
+  background: #e9edde;
+  padding: 16px 20px 20px;
+  border-top: 1px solid #d0d9c3;
+}
+.decision-prompt {
+  font-size: 12px;
+  color: #4b6240;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+.action-panel textarea {
+  font-size: 12px;
+  background: #fafbf4;
+  min-height: 62px;
+}
+.action-buttons {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin-top: 10px;
+}
+.action-buttons button {
+  font-size: 11px;
+  padding: 9px 12px;
+  white-space: nowrap;
+}
+.game-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.game-sidebar h2 {
+  font-size: 13px;
+  margin: 0;
+}
+.opponent-panel,
+.stack-panel,
+.log-panel {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 18px;
+  background: #f1f3e9;
+}
+.opponent-panel .model-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 8px 0 20px;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+.checkbox-label input {
+  width: 15px;
+  height: 15px;
+  min-height: 15px;
+  accent-color: var(--green);
+  margin: 0;
+}
+.opponent-panel button {
+  font-size: 11px;
+  width: 100%;
+  margin-top: 5px;
+}
+.empty {
+  font-size: 11px;
+  color: #718267;
+  line-height: 1.75;
+  padding: 20px 0;
+  margin: 0;
+}
+.stack-panel > .section-heading > span {
+  font-size: 11px;
+  color: #6d7d61;
+}
+.stack-item {
+  margin-top: 15px;
+  padding: 12px;
+  background: #e4e9d9;
+  border: 1px solid #cbd6bc;
+  border-left: 3px solid #718950;
+}
+.stack-item > .eyebrow {
+  font-size: 8px;
+  display: block;
+  margin-bottom: 8px;
+}
+.stack-item > strong {
+  font-size: 12px;
+}
+.stack-item p {
+  font-size: 11px;
+  margin: 6px 0 0;
+}
+.log-panel {
+  flex: 1;
+  min-height: 200px;
+  max-height: 650px;
+  display: flex;
+  flex-direction: column;
+}
+.log-panel .section-heading {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 9px;
+}
+.log-panel button {
+  font-size: 10px;
+}
+.log-entries {
+  overflow: auto;
+  flex: 1;
+  max-height: 560px;
+  scrollbar-width: thin;
+}
+.log-entries article {
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+.log-entries article > span {
+  font-size: 9px;
+  color: #6e7f60;
+  display: block;
+  margin-bottom: 6px;
+}
+.log-entries p {
+  font-size: 11px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+.sidebar-note {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--muted);
+  padding: 0 5px;
+}
+.card-detail {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 3px solid #7c9564;
+  border-radius: 4px;
+}
+.card-detail .oracle {
+  font-size: 14px;
+}
+.stats {
+  text-align: right;
+  font-size: 18px !important;
+  font-weight: 650;
+}
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+}
+.card-actions button {
+  font-size: 12px;
+}
+.zone-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+}
+.game-result {
+  padding: 30px;
+  background: #dfe8cd;
+}
+.game-result h2 {
+  font-family: "Libre Caslon Display", Georgia, serif;
+  font-size: 38px;
+  margin-bottom: 10px;
+}
+.editor-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+.editor-tabs .active {
+  background: var(--green);
+  color: white;
+}
+.editor-players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.editor-players fieldset {
+  border: 1px solid var(--line);
+  padding: 12px 18px;
+  border-radius: 4px;
+  min-width: 0;
+}
+.editor-players legend {
+  font-size: 12px;
+  padding: 0 8px;
+}
+.json-editor {
+  font-family: monospace;
+  font-size: 11px;
+}
+.error-text {
+  color: #8b3822;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (min-width: 1550px) {
+  .lobby {
+    gap: 150px;
+    max-width: 1380px;
+  }
+  .intro h1 {
+    font-size: 112px;
+  }
+  .setup {
+    padding: 38px;
+  }
+  .text-card {
+    width: 185px;
+    min-width: 185px;
+    max-width: 185px;
+  }
+  .text-card .oracle {
+    font-size: 10px;
+  }
+  .game-page {
+    padding: 0 40px 40px;
+  }
+  .table-layout {
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+  .battlefield {
+    min-height: 180px;
+  }
+  .field-empty {
+    min-height: 124px;
+  }
+}
+@media (max-width: 1150px) {
+  .lobby {
+    gap: 50px;
+    padding: 50px 40px;
+  }
+  .intro h1 {
+    font-size: 78px;
+  }
+  .table-layout {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 12px;
+  }
+  .game-page {
+    padding: 0 14px 20px;
+  }
+  .player-bar {
+    flex-wrap: wrap;
+    padding: 12px;
+    gap: 10px;
+  }
+  .player-bar.active-player {
+    padding-left: 9px;
+  }
+  .zone-buttons {
+    width: 100%;
+  }
+  .zone-buttons button {
+    flex: 1;
+    padding: 6px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+  }
+  .zone-buttons b {
+    font-size: 13px;
+  }
+  .mana-pool {
+    gap: 10px;
+  }
+  .player-data {
+    min-width: 0;
+  }
+  .phase-bar span {
+    padding: 10px 5px;
+    font-size: 8px;
+  }
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+  .hand-zone .section-heading > .small {
+    font-size: 10px;
+  }
+  .deck-tile {
+    padding: 22px 18px;
+  }
+  .tile-actions {
+    flex-wrap: wrap;
+  }
+  .game-toolbar > div:first-child {
+    flex-direction: column;
+    align-items: start;
+    gap: 5px;
+  }
+  .rules-strip {
+    gap: 22px;
+  }
+}
+@media (max-width: 820px) {
+  .site-header {
+    padding: 0 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+    min-height: 112px;
+  }
+  .brand {
+    font-size: 23px;
+  }
+  .brand-caption {
+    font-size: 9px;
+  }
+  .site-header nav {
+    order: 3;
+    width: 100%;
+    height: 37px;
+    justify-content: center;
+    gap: 40px;
+    margin-top: -10px;
+  }
+  .connection-button {
+    margin-left: auto;
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+  .lobby {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 45px 25px;
+    align-items: start;
+  }
+  .intro h1 {
+    font-size: 65px;
+  }
+  .intro-copy {
+    font-size: 17px;
+  }
+  .intro-detail {
+    font-size: 12px;
+  }
+  .rules-strip {
+    gap: 14px;
+  }
+  .rules-strip b {
+    font-size: 21px;
+  }
+  .rules-strip span {
+    font-size: 9px;
+  }
+  .setup {
+    padding: 22px;
+  }
+  .setup h2 {
+    font-size: 33px;
+  }
+  .setup .section-heading > .small {
+    display: none;
+  }
+  .table-layout {
+    grid-template-columns: 1fr;
+  }
+  .game-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .log-panel {
+    grid-column: 1/-1;
+    max-height: 300px;
+  }
+  .sidebar-note {
+    grid-column: 1/-1;
+  }
+  .game-toolbar {
+    padding: 12px 0;
+    min-height: 82px;
+  }
+  .toolbar-actions {
+    flex-wrap: wrap;
+    justify-content: end;
+  }
+  .toolbar-actions button {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+  .player-bar {
+    flex-wrap: nowrap;
+  }
+  .zone-buttons {
+    width: auto;
+  }
+  .zone-buttons button {
+    flex-direction: column;
+    min-width: 50px;
+    gap: 5px;
+  }
+  .mana-pool {
+    gap: 7px;
+  }
+  .zone-buttons span {
+    font-size: 8px;
+  }
+  .deck-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .library-page,
+  .guide-page {
+    padding: 38px 25px;
+  }
+  .page-title h1,
+  .guide-page h1 {
+    font-size: 58px;
+  }
+  .page-title {
+    align-items: start;
+  }
+  .page-title > .small {
+    max-width: 170px;
+  }
+  .guide-grid {
+    gap: 30px;
+  }
+  .site-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .modal {
+    padding: 23px;
+  }
+  .game-toolbar strong {
+    font-size: 12px;
+  }
+  .hand-zone .section-heading > .small {
+    font-size: 11px;
+  }
+}
+@media (max-width: 580px) {
+  .lobby {
+    grid-template-columns: 1fr;
+    padding: 34px 22px;
+    gap: 35px;
+  }
+  .intro h1 {
+    font-size: 73px;
+    margin: 24px 0;
+  }
+  .intro-copy {
+    font-size: 18px;
+  }
+  .intro-detail {
+    margin-top: 15px;
+  }
+  .rules-strip {
+    margin: 25px 0 18px;
+    gap: 35px;
+  }
+  .rules-strip b {
+    font-size: 24px;
+  }
+  .rules-strip span {
+    font-size: 10px;
+  }
+  .session-note {
+    font-size: 10px;
+  }
+  .setup {
+    padding: 24px;
+  }
+  .setup h2 {
+    font-size: 39px;
+  }
+  .deck-grid {
+    grid-template-columns: 1fr;
+  }
+  .page-title {
+    display: block;
+  }
+  .page-title > .small {
+    max-width: none;
+  }
+  .deck-tile-top {
+    margin-bottom: 22px;
+  }
+  .tile-actions {
+    flex-wrap: nowrap;
+  }
+  .guide-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: 20px;
+  }
+  .game-page {
+    padding: 0 8px 20px;
+  }
+  .game-toolbar {
+    align-items: start;
+    gap: 12px;
+  }
+  .game-toolbar strong {
+    font-size: 11px;
+  }
+  .game-toolbar .eyebrow {
+    font-size: 9px;
+  }
+  .toolbar-actions {
+    max-width: 165px;
+    gap: 4px;
+  }
+  .toolbar-actions button {
+    font-size: 9px;
+    min-height: 29px;
+    padding: 5px 7px;
+  }
+  .player-bar {
+    flex-wrap: wrap;
+    padding: 12px;
+    gap: 10px;
+  }
+  .player-data {
+    flex: 1;
+  }
+  .player-bar .zone-buttons {
+    width: 100%;
+    gap: 5px;
+  }
+  .zone-buttons button {
+    flex: 1;
+    flex-direction: row;
+    gap: 6px;
+    min-height: 34px;
+  }
+  .zone-buttons span {
+    font-size: 8px;
+  }
+  .life-total strong {
+    font-size: 34px;
+  }
+  .table-status {
+    padding: 10px;
+    font-size: 9px;
+  }
+  .phase-bar {
+    padding: 0 5px;
+    justify-content: start;
+    gap: 0;
+  }
+  .phase-bar span {
+    font-size: 8px;
+    padding: 10px 6px;
+  }
+  .battlefield {
+    padding: 12px;
+    min-height: 145px;
+  }
+  .field-empty {
+    font-size: 11px;
+    min-height: 95px;
+  }
+  .hand-zone {
+    padding: 13px;
+  }
+  .hand-zone .section-heading {
+    align-items: start;
+  }
+  .hand-zone .section-heading > .small {
+    font-size: 9px;
+    max-width: 160px;
+    text-align: right;
+  }
+  .text-card {
+    width: 151px;
+    min-width: 151px;
+    max-width: 151px;
+  }
+  .text-card .oracle {
+    font-size: 9px;
+  }
+  .mulligan-bar {
+    flex-wrap: wrap;
+    padding: 17px 14px;
+    justify-content: end;
+  }
+  .mulligan-bar > div {
+    flex: 1 0 100%;
+    margin-bottom: 4px;
+  }
+  .mulligan-bar button {
+    font-size: 12px;
+  }
+  .action-panel {
+    padding: 14px 12px;
+  }
+  .action-buttons button {
+    font-size: 10px;
+    padding: 9px 10px;
+  }
+  .action-buttons .grow {
+    display: none;
+  }
+  .game-sidebar {
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+  .opponent-panel,
+  .stack-panel,
+  .log-panel {
+    padding: 13px;
+  }
+  .game-sidebar h2 {
+    font-size: 11px;
+  }
+  .checkbox-label {
+    font-size: 11px;
+  }
+  .opponent-panel .small {
+    font-size: 10px;
+  }
+  .opponent-panel .model-label {
+    font-size: 10px;
+    overflow-wrap: anywhere;
+  }
+  .stack-item {
+    padding: 8px;
+  }
+  .stack-item p {
+    font-size: 10px;
+  }
+  .site-header {
+    padding: 14px 19px 0;
+  }
+  .site-header nav {
+    gap: 28px;
+    margin-top: 1px;
+  }
+  .site-header nav button {
+    font-size: 12px;
+  }
+  .site-footer {
+    font-size: 9px;
+    padding: 20px;
+  }
+  .editor-players {
+    grid-template-columns: 1fr;
+  }
+  .modal {
+    padding: 21px;
+    max-height: 92dvh;
+  }
+  .modal > header h2 {
+    font-size: 28px;
+  }
+  .modal-actions {
+    flex-wrap: wrap;
+  }
+  .zone-cards {
+    gap: 8px;
+  }
+  .zone-cards .text-card {
+    min-width: calc(50% - 4px);
+    max-width: calc(50% - 4px);
+  }
+  .deck-card-list summary {
+    gap: 8px;
+    font-size: 11px;
+  }
+  .deck-card-list .mana-symbol {
+    width: 15px;
+    height: 15px;
+    font-size: 8px;
+  }
+  .card-title h3 {
+    font-size: 23px;
+  }
+  .card-title {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
