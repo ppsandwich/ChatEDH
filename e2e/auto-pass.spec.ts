@@ -70,6 +70,7 @@ test("automatically passes, resumes the opponent, then holds a human response wi
   await expect(page.locator(".table-status")).toContainText(
     "You have priority",
   );
+  await page.getByRole("tab", { name: "Chronicle" }).click();
   await expect(page.getByRole("log")).toContainText(
     "Automatically passed priority",
   );

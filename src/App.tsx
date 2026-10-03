@@ -18,6 +18,7 @@ import {
   type PlayerId,
 } from "./lib/game";
 import { Modal } from "./components/Modal";
+import { CastPanel, type CastRequest } from "./components/CastPanel";
 import { PriorityBanner } from "./components/PriorityBanner";
 import { CardText, CardView, Mana } from "./components/CardView";
 const SAVE = "chatedh-game-v1";
@@ -164,6 +165,10 @@ export default function App() {
   const [confirmConcede, setConfirmConcede] = useState(false);
   const [autoAi, setAutoAi] = useState(true);
   const [autoPass, setAutoPass] = useState(true);
+  const [autoTap, setAutoTap] = useState(true);
+  const [tablePanel, setTablePanel] = useState<"stack" | "log" | "settings">(
+    "stack",
+  );
   const [automationPaused, setAutomationPaused] = useState(false);
   const [checkingPriority, setCheckingPriority] = useState(false);
   const checkedPriority = useRef<Game | null>(null);
@@ -207,6 +212,7 @@ export default function App() {
     text: string,
     actor: "you" | "ai" | "system" = "you",
     automatic = false,
+    cast?: CastRequest,
   ) {
     const current = gameRef.current;
     if (!current || busyRef.current) return;
@@ -235,9 +241,15 @@ export default function App() {
           action: text,
           actor,
           autoPass: automatic,
+          autoTap,
+          cast,
         }),
       });
-      const d = await r.json();
+      const d = await r.json().catch(() => {
+        throw new Error(
+          "The game server is unavailable. Reconnect and try again.",
+        );
+      });
       if (!r.ok) throw new Error(d.error ?? "The AI request failed.");
       if (gameRef.current !== current) return;
       if (automatic && d.autoPassed !== true) return;
@@ -650,11 +662,11 @@ export default function App() {
               </p>
               <h2>03. Make your move</h2>
               <p>
-                Click a card to read it and prepare a cast, activation or
-                attack. Add targets, modes and payment in the action box, then
-                submit. You can also type any legal action: “Cast Sol Ring using
-                one colourless mana” or “Block the attacking Warrior with Birds
-                of Paradise”.
+                Tap a card to read it, choose targets or modes, and cast.
+                Auto-tap is on by default: review the suggested payment before
+                casting. Turn it off to choose your own mana sources. You can
+                also describe an ability, attack or block in the action box.
+                Open Chronicle for the game log and Settings for autoplay.
               </p>
             </section>
             <section>
@@ -884,7 +896,10 @@ export default function App() {
                     Another game →
                   </button>
                 </div>
-              ) : (
+              ) : null}
+            </div>
+            <aside className="game-sidebar" aria-label="Table details">
+              {game.status === "playing" && (
                 <section
                   className={`action-panel ${usable ? "your-priority" : ""}`}
                   aria-label="Game actions"
@@ -900,6 +915,17 @@ export default function App() {
                     {usable && (
                       <span className="priority-state">You have priority</span>
                     )}
+                  </div>
+                  <div className="action-tools">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={autoTap}
+                        onChange={(e) => setAutoTap(e.target.checked)}
+                      />
+                      Auto-tap mana
+                    </label>
+                    <span>Tap a card to play it</span>
                   </div>
                   <p className="decision-prompt" aria-live="polite">
                     {game.prompt}
@@ -918,7 +944,7 @@ export default function App() {
                       rows={2}
                       value={action}
                       onChange={(e) => setAction(e.target.value)}
-                      placeholder="Describe your action, targets and mana payment…"
+                      placeholder="Describe an action, or select a card…"
                       disabled={!usable}
                     />
                     <div className="action-buttons">
@@ -975,9 +1001,60 @@ export default function App() {
                   </form>
                 </section>
               )}
-            </div>
-            <aside className="game-sidebar">
-              <section className="opponent-panel">
+              {game.status === "playing" &&
+                (autoAi || autoPass) &&
+                (automationPaused || automationCount >= 8) && (
+                  <div className="sidebar-paused" role="status">
+                    <strong>Automatic play paused</strong>
+                    <p>
+                      {automationPaused
+                        ? "Your autoplay settings are still enabled."
+                        : "Eight actions completed. Ready to continue?"}
+                    </p>
+                    <button
+                      disabled={busy || !connected}
+                      onClick={() => {
+                        checkedPriority.current = null;
+                        setAutomationCount(0);
+                        setAutomationPaused(false);
+                        setError("");
+                      }}
+                    >
+                      {automationPaused
+                        ? "Resume automatic play"
+                        : "Continue automatic play"}
+                    </button>
+                  </div>
+                )}
+              <div
+                className="table-tabs"
+                role="tablist"
+                aria-label="Table panels"
+              >
+                {(["stack", "log", "settings"] as const).map((panel) => (
+                  <button
+                    key={panel}
+                    role="tab"
+                    id={`tab-${panel}`}
+                    aria-selected={tablePanel === panel}
+                    aria-controls={`panel-${panel}`}
+                    onClick={() => setTablePanel(panel)}
+                  >
+                    {panel === "stack"
+                      ? `Stack ${game.stack.length}`
+                      : panel === "log"
+                        ? "Chronicle"
+                        : "Settings"}
+                  </button>
+                ))}
+              </div>
+              <section
+                id="panel-settings"
+                role="tabpanel"
+                aria-labelledby="tab-settings"
+                hidden={tablePanel !== "settings"}
+                className="opponent-panel"
+              >
                 <div className="section-heading">
                   <h2>Across the table</h2>
                   <span className={`status-dot ${connected ? "online" : ""}`} />
@@ -1010,25 +1087,6 @@ export default function App() {
                   />
                   Auto-pass when no legal actions
                 </label>
-                {automationPaused &&
-                  (autoAi || autoPass) &&
-                  game.status === "playing" && (
-                    <div className="automation-pause" role="status">
-                      <strong>Automatic play paused</strong>
-                      <p>Your autoplay settings are still enabled.</p>
-                      <button
-                        disabled={busy || !connected}
-                        onClick={() => {
-                          checkedPriority.current = null;
-                          setAutomationCount(0);
-                          setAutomationPaused(false);
-                          setError("");
-                        }}
-                      >
-                        Resume automatic play
-                      </button>
-                    </div>
-                  )}
                 <p className="small muted">
                   Priority passes automatically only when the referee finds no
                   legal action or pending choice.
@@ -1054,19 +1112,14 @@ export default function App() {
                       →
                     </button>
                   )}
-                {automationCount >= 8 && (
-                  <p className="small">
-                    Automatic play paused after 8 actions.
-                    <button
-                      disabled={busy}
-                      onClick={() => setAutomationCount(0)}
-                    >
-                      Continue automatic play
-                    </button>
-                  </p>
-                )}
               </section>
-              <section className="stack-panel">
+              <section
+                id="panel-stack"
+                role="tabpanel"
+                aria-labelledby="tab-stack"
+                hidden={tablePanel !== "stack"}
+                className="stack-panel"
+              >
                 <div className="section-heading">
                   <h2>The stack</h2>
                   <span>{game.stack.length}</span>
@@ -1089,7 +1142,13 @@ export default function App() {
                   </p>
                 )}
               </section>
-              <section className="log-panel">
+              <section
+                id="panel-log"
+                role="tabpanel"
+                aria-labelledby="tab-log"
+                hidden={tablePanel !== "log"}
+                className="log-panel"
+              >
                 <div className="section-heading">
                   <h2>Game log</h2>
                   <button
@@ -1308,49 +1367,49 @@ export default function App() {
           </div>
           {usable && (
             <div className="card-actions">
-              {(selectedCard.zone === "hand" ||
-                selectedCard.zone === "command" ||
-                selectedCard.zone === "graveyard" ||
-                selectedCard.zone === "exile") && (
-                <button
-                  className="primary"
-                  onClick={() =>
-                    cardAction(
-                      definition(selectedCard).type.includes("Land")
-                        ? "Play"
-                        : "Cast",
-                    )
-                  }
-                >
-                  Prepare{" "}
-                  {definition(selectedCard).type.includes("Land")
-                    ? "land play"
-                    : "cast"}
-                </button>
-              )}
-              {selectedCard.zone === "battlefield" && (
-                <>
-                  <button onClick={() => cardAction("Activate an ability of")}>
-                    Activate ability
-                  </button>
-                  <button onClick={() => cardAction("Tap for mana:")}>
-                    Tap for mana
-                  </button>
-                  {definition(selectedCard).type.includes("Creature") && (
-                    <button onClick={() => cardAction("Declare as attacker:")}>
-                      Attack with this
+              {selectedCard.owner === "you" &&
+                ["hand", "command", "graveyard", "exile"].includes(
+                  selectedCard.zone,
+                ) && (
+                  <CastPanel
+                    key={selectedCard.id}
+                    game={game!}
+                    card={selectedCard}
+                    autoTap={autoTap}
+                    onCast={(text, request) => {
+                      setSelected(null);
+                      setAction(text);
+                      void play(text, "you", false, request);
+                    }}
+                  />
+                )}
+              {selectedCard.zone === "battlefield" &&
+                selectedCard.controller === "you" && (
+                  <>
+                    <button
+                      onClick={() => cardAction("Activate an ability of")}
+                    >
+                      Activate ability
                     </button>
-                  )}
-                </>
-              )}
+                    <button onClick={() => cardAction("Tap for mana:")}>
+                      Tap for mana
+                    </button>
+                    {definition(selectedCard).type.includes("Creature") && (
+                      <button
+                        onClick={() => cardAction("Declare as attacker:")}
+                      >
+                        Attack with this
+                      </button>
+                    )}
+                  </>
+                )}
               <button onClick={() => cardAction("Choose as target:")}>
                 Use as target
               </button>
             </div>
           )}
           <p className="small muted">
-            Use the action box for modes, targets, alternative costs, abilities,
-            or any other legal action.
+            You can also describe abilities or unusual plays in the action box.
           </p>
           {definition(selectedCard).scryfallUrl && (
             <a
@@ -1543,6 +1602,18 @@ function Battlefield({
           )}
         </>
       )}
+      <div
+        className="command-row"
+        aria-label={`${player === "you" ? "Your" : "Opponent’s"} commanders`}
+      >
+        <span>Command zone</span>
+        {cardsIn(game, player, "command").map((c) => (
+          <button key={c.id} onClick={() => select(c.id)}>
+            <strong>{c.name}</strong>
+            <Mana cost={definition(c).manaCost} />
+          </button>
+        ))}
+      </div>
     </section>
   );
 }
@@ -1565,7 +1636,7 @@ function PlayerBar({
     >
       <div className="life-total">
         <span>{player === "you" ? "You" : "Opponent"}</span>
-        <strong>{p.life}</strong>
+        <strong key={p.life}>{p.life}</strong>
         <span>life</span>
       </div>
       <div className="player-data">

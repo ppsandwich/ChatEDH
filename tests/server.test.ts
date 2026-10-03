@@ -316,3 +316,129 @@ describe("automatic priority passing", () => {
     expect((await r.json()).game).toBeUndefined();
   });
 });
+
+describe("automatic mana payments", () => {
+  const castingTable = () => {
+    const g = game();
+    g.turn = 3;
+    g.phase = "Main 1";
+    const source = g.cards.find(
+      (c) => c.owner === "you" && c.name === "Sol Ring",
+    )!;
+    const spell = g.cards.find(
+      (c) => c.owner === "you" && c.name === "Arcane Signet",
+    )!;
+    source.zone = "battlefield";
+    spell.zone = "hand";
+    return { g, source, spell };
+  };
+  it("computes payment server-side and commits it with the approved cast", async () => {
+    const { g, source, spell } = castingTable();
+    let context: any;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        context = JSON.parse(
+          JSON.parse(init.body as string).messages[1].content,
+        );
+        return reply({
+          summary: "Cast Arcane Signet.",
+          prompt: "AI priority.",
+          useManaPlan: true,
+          operations: [
+            { op: "move", cardId: spell.id, zone: "stack" },
+            {
+              op: "stackAdd",
+              item: {
+                id: "signet-cast",
+                cardId: spell.id,
+                label: "Arcane Signet",
+                controller: "you",
+                details: "Artifact spell",
+              },
+            },
+            { op: "priority", player: "ai" },
+          ],
+        });
+      }),
+    );
+    const response = await post({
+      key: "test-key",
+      model: "test/model",
+      game: g,
+      action: "Cast Arcane Signet.",
+      autoTap: true,
+      cast: { cardId: spell.id, xValue: 0 },
+    });
+    expect(response.status).toBe(200);
+    expect(context.manaPlan.status).toBe("ready");
+    expect(
+      context.manaPlan.sources.map((s: { cardId: string }) => s.cardId),
+    ).toEqual([source.id]);
+    const data = await response.json();
+    expect(
+      data.game.cards.find((c: { id: string }) => c.id === source.id).tapped,
+    ).toBe(true);
+    expect(
+      data.game.cards.find((c: { id: string }) => c.id === spell.id).zone,
+    ).toBe("stack");
+    expect(data.game.log.at(-1).text).toContain("Auto-tap: Tap Sol Ring");
+  });
+  it("leaves resources unchanged when the referee refuses a cast", async () => {
+    const { g, source, spell } = castingTable();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        reply({
+          summary: "Cannot cast now.",
+          prompt: "Wait for your main phase.",
+          operations: [],
+        }),
+      ),
+    );
+    const response = await post({
+      key: "test-key",
+      model: "test/model",
+      game: g,
+      action: "Cast Arcane Signet.",
+      autoTap: true,
+      cast: { cardId: spell.id },
+    });
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(
+      data.game.cards.find((c: { id: string }) => c.id === source.id).tapped,
+    ).toBe(false);
+    expect(
+      data.game.cards.find((c: { id: string }) => c.id === spell.id).zone,
+    ).toBe("hand");
+  });
+  it("disables plan payment when the player opts out", async () => {
+    const { g, spell } = castingTable();
+    let context: any;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        context = JSON.parse(
+          JSON.parse(init.body as string).messages[1].content,
+        );
+        return reply({
+          summary: "Specify payment.",
+          prompt: "Choose mana sources.",
+          operations: [],
+        });
+      }),
+    );
+    const response = await post({
+      key: "test-key",
+      model: "test/model",
+      game: g,
+      action: "Cast Arcane Signet.",
+      autoTap: false,
+      cast: { cardId: spell.id },
+    });
+    expect(response.status).toBe(200);
+    expect(context.autoTap).toBe(false);
+    expect(context.manaPlan).toBeNull();
+  });
+});

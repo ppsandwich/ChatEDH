@@ -10,6 +10,7 @@ test("deck library, London mulligan, correction, undo and persistence", async ({
     page.getByRole("heading", { name: "A seat at the table." }),
   ).toBeVisible();
   await page.screenshot({
+    animations: "disabled",
     path: "artifacts/lobby-desktop.png",
     fullPage: true,
   });
@@ -41,6 +42,7 @@ test("deck library, London mulligan, correction, undo and persistence", async ({
   await page.reload();
   await expect(page.locator(".hand-cards .text-card")).toHaveCount(6);
   await page.screenshot({
+    animations: "disabled",
     path: "artifacts/table-desktop.png",
     fullPage: true,
   });
@@ -111,7 +113,11 @@ test("AI connection, response window, failure and completed game using a stub pr
 test("mobile layout remains usable without page overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await page.screenshot({ path: "artifacts/lobby-mobile.png", fullPage: true });
+  await page.screenshot({
+    animations: "disabled",
+    path: "artifacts/lobby-mobile.png",
+    fullPage: true,
+  });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -120,7 +126,11 @@ test("mobile layout remains usable without page overflow", async ({ page }) => {
   await page.getByLabel("Who plays first?").selectOption("you");
   await page.getByRole("button", { name: "Shuffle up & play" }).click();
   await page.getByRole("button", { name: "Keep 7" }).click();
-  await page.screenshot({ path: "artifacts/table-mobile.png", fullPage: true });
+  await page.screenshot({
+    animations: "disabled",
+    path: "artifacts/table-mobile.png",
+    fullPage: true,
+  });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -172,4 +182,115 @@ test("starts and saves a game when randomUUID is unavailable", async ({
   await page.reload();
   await expect(page.locator(".hand-cards .text-card")).toHaveCount(7);
   expect(errors).toEqual([]);
+});
+
+test("tablet casting previews mana, submits the card and shows a tapped source", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.route("**/api/status", (r) =>
+    r.fulfill({ json: { serverKey: false, accessTokenRequired: false } }),
+  );
+  await page.goto("/");
+  await page.getByLabel("Who plays first?").selectOption("you");
+  await page.getByRole("button", { name: "Shuffle up & play" }).click();
+  await page.getByRole("button", { name: "Keep 7" }).click();
+  const ids = await page.evaluate(() => {
+    const g = JSON.parse(localStorage.getItem("chatedh-game-v1")!);
+    g.turn = 3;
+    g.phase = "Main 1";
+    const source = g.cards.find(
+      (c: any) => c.owner === "you" && c.name === "Sol Ring",
+    );
+    const spell = g.cards.find(
+      (c: any) => c.owner === "you" && c.name === "Arcane Signet",
+    );
+    const island = g.cards.find(
+      (c: any) => c.owner === "you" && c.name === "Island",
+    );
+    source.zone = "battlefield";
+    island.zone = "battlefield";
+    spell.zone = "hand";
+    localStorage.setItem("chatedh-game-v1", JSON.stringify(g));
+    return { source: source.id, spell: spell.id, island: island.id };
+  });
+  await page.reload();
+  await expect(page.getByLabel("Auto-tap mana")).toBeChecked();
+  await page.getByRole("tab", { name: "Settings", exact: true }).click();
+  await page.getByLabel("AI autoplay", { exact: true }).uncheck();
+  await page.getByLabel("Auto-pass when no legal actions").uncheck();
+  await page.getByRole("tab", { name: "Stack 0" }).click();
+  await page.getByRole("button", { name: "Connect AI", exact: true }).click();
+  await page.getByLabel("OpenRouter API key", { exact: true }).fill("test-key");
+  await page.getByRole("button", { name: "Save connection" }).click();
+  let castRequest: any;
+  await page.route("**/api/play", async (route) => {
+    const body = route.request().postDataJSON();
+    castRequest = body;
+    const g = body.game;
+    g.cards.find((c: any) => c.id === ids.source).tapped = true;
+    g.cards.find((c: any) => c.id === ids.spell).zone = "stack";
+    g.stack = [
+      {
+        id: "cast-signet",
+        cardId: ids.spell,
+        label: "Arcane Signet",
+        controller: "you",
+        details: "Artifact spell",
+      },
+    ];
+    g.priority = "ai";
+    g.prompt = "Opponent may respond.";
+    g.log.push({
+      id: "test-cast",
+      turn: 3,
+      actor: "you",
+      text: "Cast Arcane Signet. Auto-tap: Tap Sol Ring → {C}{C}",
+    });
+    await route.fulfill({ json: { game: g } });
+  });
+  await page
+    .locator(".hand-cards .text-card")
+    .filter({ hasText: "Arcane Signet" })
+    .click();
+  await expect(page.locator(".mana-preview")).toContainText("Tap Sol Ring");
+  await expect(page.locator(".mana-preview")).not.toContainText("Tap Island");
+  await page.screenshot({
+    animations: "disabled",
+    path: "artifacts/cast-tablet.png",
+  });
+  await page.getByRole("button", { name: "Cast with auto-tap" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator(".priority-banner")).toContainText(
+    "Opponent has priority",
+  );
+  expect(castRequest.autoTap).toBe(true);
+  expect(castRequest.cast).toEqual({ cardId: ids.spell, xValue: 0 });
+  await expect(
+    page.locator(".text-card.tapped").filter({ hasText: "Sol Ring" }),
+  ).toHaveCount(1);
+  await expect(page.locator(".stack-item")).toContainText("Arcane Signet");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    animations: "disabled",
+    path: "artifacts/table-tablet-landscape.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.getByRole("tab", { name: "Chronicle" }).click();
+  await expect(page.getByRole("log")).toContainText("Auto-tap: Tap Sol Ring");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    animations: "disabled",
+    path: "artifacts/table-tablet-portrait.png",
+    fullPage: true,
+  });
 });

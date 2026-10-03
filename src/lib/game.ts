@@ -49,6 +49,7 @@ export const cardSchema = z.object({
   controller: playerId,
   zone: z.enum(zones),
   tapped: z.boolean(),
+  controlledSinceTurn: z.number().int().min(1).optional(),
   commander: z.boolean(),
   token: z.boolean(),
   counters: z.record(z.string(), z.number().int().min(-1000000).max(1000000)),
@@ -194,6 +195,7 @@ export const rulingSchema = z.object({
   operations: z.array(opSchema).max(300),
   prompt: z.string().max(3000),
   continueResolution: z.boolean().optional(),
+  useManaPlan: z.boolean().optional(),
 });
 export type Ruling = z.infer<typeof rulingSchema>;
 export function uid(): string {
@@ -393,6 +395,7 @@ export function applyRuling(
       if (!c) throw new Error(`Unknown card ${op.cardId}`);
       c.zone = op.zone;
       c.controller = op.controller ?? c.owner;
+      c.controlledSinceTurn = op.zone === "battlefield" ? g.turn : undefined;
       c.damage = 0;
       c.counters = {};
       c.tapped = false;
@@ -419,6 +422,8 @@ export function applyRuling(
       const c = g.cards.find((c) => c.id === op.cardId);
       if (!c) throw new Error(`Unknown card ${op.cardId}`);
       const { op: _, cardId: __, ...patch } = op;
+      if (patch.controller && patch.controller !== c.controller)
+        c.controlledSinceTurn = g.turn;
       Object.assign(c, patch);
     } else if (op.op === "player") {
       const { op: _, player, ...patch } = op;
@@ -452,6 +457,7 @@ export function applyRuling(
           tapped: false,
           commander: false,
           token: true,
+          controlledSinceTurn: g.turn,
           counters: {},
           damage: 0,
           notes: "",

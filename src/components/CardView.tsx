@@ -60,7 +60,11 @@ export function CardView({
               ? "Commander"
               : card.token
                 ? "Token"
-                : "Untapped"}
+                : card.zone === "hand"
+                  ? "In hand"
+                  : card.zone === "battlefield"
+                    ? "Ready"
+                    : card.zone}
           {card.damage > 0 ? ` · ${card.damage} damage` : ""}
         </span>
         <b>

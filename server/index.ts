@@ -9,6 +9,7 @@ import {
   validateGame,
   type Game,
 } from "../src/lib/game.ts";
+import { planMana, withManaPayment, type ManaPlan } from "../src/lib/mana.ts";
 import { OPPONENT, REFEREE, PRIORITY_CHECK } from "./prompts.ts";
 if (!process.env.VITEST) {
   try {
@@ -65,6 +66,13 @@ const reqSchema = z.object({
   action: z.string().min(1).max(4000).optional(),
   actor: z.enum(["you", "ai", "system"]).default("you"),
   autoPass: z.boolean().default(false),
+  autoTap: z.boolean().default(true),
+  cast: z
+    .object({
+      cardId: z.string().max(100),
+      xValue: z.number().int().min(0).max(1000).default(0),
+    })
+    .optional(),
 });
 async function completion(
   key: string,
@@ -199,12 +207,24 @@ app.post("/api/play", async (req, res) => {
       announcement = decision.announcement;
     }
     if (!action) throw new Error("An action is required.");
+    let manaPlan: ManaPlan | null = null;
+    if (
+      input.cast &&
+      input.actor === "you" &&
+      input.autoTap &&
+      !input.autoPass
+    ) {
+      const card = game.cards.find((c) => c.id === input.cast!.cardId);
+      if (!card || card.owner !== "you")
+        throw new Error("Choose one of your cards to cast.");
+      manaPlan = planMana(game, card, "you", input.cast.xValue);
+    }
     // All adjudication stages commit together. A timeout/error never partially changes a game.
     const original = game;
     const summaries: string[] = [];
     let continuing = false;
     for (let i = 0; i < 5; i++) {
-      const result = rulingSchema.parse(
+      let result = rulingSchema.parse(
         await completion(
           key,
           input.model,
@@ -214,6 +234,9 @@ app.post("/api/play", async (req, res) => {
             actor: input.actor,
             action,
             continuing,
+            autoTap: input.autoTap && input.actor === "you",
+            castingCard: input.cast ?? null,
+            manaPlan: i === 0 ? manaPlan : null,
             outputSchema: z.toJSONSchema(rulingSchema),
           },
           controller.signal,
@@ -225,6 +248,17 @@ app.post("/api/play", async (req, res) => {
         );
       if (input.autoPass && i === 0)
         result.summary = `Automatically passed priority (no legal actions). ${result.summary}`;
+      if (result.useManaPlan) {
+        if (i !== 0 || !manaPlan || !input.cast || input.actor !== "you")
+          throw new Error("The referee requested an unavailable mana plan.");
+        result = withManaPayment(
+          game,
+          result,
+          manaPlan,
+          input.cast.cardId,
+          "you",
+        );
+      }
       game = applyRuling(game, result, input.actor);
       summaries.push(result.summary);
       if (!result.continueResolution || game.status === "finished") {
